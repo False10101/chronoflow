@@ -18,3 +18,12 @@ body {
 .font-orbitron {
   font-family: "Orbitron", sans-serif;
 }
+
+select {
+  transform: translateX(0) !important;
+  margin-left: 0 !important;
+}
+option {
+  margin-left: 0 !important;
+  padding-left: 12px !important;
+}

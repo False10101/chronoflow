@@ -1,24 +1,42 @@
-import React, {useState} from 'react';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 
+interface CustomCalendarProps {
+  month?: number;
+  year?: number;
+  events?: Array<{
+    id: number;
+    title: string;
+    date: string;
+    time: string;
+    category: string;
+    priority: string;
+    description?: string;
+    venue?: string;
+  }>;
+}
 
+interface CalendarDay {
+  dayOfMonth: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  date: Date;
+}
 
-
-    const generateCalendarDays = (date: Date) => {
+const generateCalendarDays = (date: Date): CalendarDay[] => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today's date for accurate comparison
+    today.setHours(0, 0, 0, 0);
 
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
     
     const daysInMonth = lastDayOfMonth.getDate();
-    const startDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday...
+    const startDayOfWeek = firstDayOfMonth.getDay();
 
-    const days = [];
+    const days: CalendarDay[] = [];
 
-    // --- 1. Days from the previous month ---
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
         days.push({
@@ -29,7 +47,6 @@ import { Calendar as CalendarIcon } from 'lucide-react';
         });
     }
 
-    // --- 2. Days of the current month ---
     for (let i = 1; i <= daysInMonth; i++) {
         const currentDate = new Date(year, month, i);
         days.push({
@@ -40,8 +57,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
         });
     }
 
-    // --- 3. Days from the next month ---
-    const remainingCells = 42 - days.length; // 6 weeks * 7 days
+    const remainingCells = 42 - days.length;
     for (let i = 1; i <= remainingCells; i++) {
         days.push({
             dayOfMonth: i,
@@ -54,53 +70,107 @@ import { Calendar as CalendarIcon } from 'lucide-react';
     return days;
 };
 
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'announcement': return "#DA8FFF";
+    case 'chore': return "#E0B0FF";
+    case 'classes': return "#22C55E";
+    case 'exam': return "#EF4444";
+    case 'personal': return "#6200EA";
+    case 'assignment': return "#B388FF";
+    default: return "#B388FF";
+  }
+};
 
-const CustomCalendar = () => {
-    const [currentDate, setCurrentDate] = React.useState(new Date());
-    const calendarDays = generateCalendarDays(currentDate);
+const CustomCalendar: React.FC<CustomCalendarProps> = ({ month, year, events = [] }) => {
+    const getInitialDate = () => {
+        const now = new Date();
+        const targetYear = year || now.getFullYear();
+        const targetMonth = month ? month - 1 : now.getMonth();
+        return new Date(targetYear, targetMonth, 1);
+    };
 
-    const monthName = currentDate.toLocaleString('default', { month: 'long' });
-    const year = currentDate.getFullYear();
+    const [displayDate, setDisplayDate] = useState<Date>(getInitialDate());
 
-    const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    useEffect(() => {
+        setDisplayDate(getInitialDate());
+    }, [month, year]);
+
+    const calendarDays: CalendarDay[] = generateCalendarDays(displayDate);
+    const monthName: string = displayDate.toLocaleString('default', { month: 'long' });
+    const displayYear: number = displayDate.getFullYear();
+
+    const weekdays: string[] = month? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] :['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    const getEventsForDay = (day: CalendarDay) => {
+      if (!day.isCurrentMonth) return [];
+      const dateStr = day.date.toISOString().split('T')[0];
+      return events.filter(event => event.date === dateStr);
+    };
 
     return (
         <div className="flex flex-col h-full w-full text-white ">
-            {/* Header */}
-            <div className="flex items-center gap-x-2 mt-1">
+            <div className={`${month ? "hidden" : "flex"} items-center gap-x-2 mb-2`}>
                 <CalendarIcon size={16} color="#C6A6FF"  className='ml-4'/>
-                <h2 className="font-lexend text-sm font-semibold">{monthName} {year}</h2>
+                <h2 className="font-lexend text-sm font-semibold">{monthName} {displayYear}</h2>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-7 flex-grow">
-                {/* Weekday Headers */}
+            <div className="grid grid-cols-7">
                 {weekdays.map(day => (
-                    <span key={day} className="flex items-center justify-center text-xs font-semibold text-white/60">
+                    <span 
+                        key={day} 
+                        className={`
+                            flex items-center justify-center   text-white/60 
+                            ${month ? 'mt-4 mb-2 ml-3' : 'text-xs font-semibold'}
+                        `}
+                    >
                         {day}
                     </span>
                 ))}
-
-                {/* Day Cells */}
-                {calendarDays.map((day, index) => (
-                    <div
-                        key={index}
-                        className={`
-                            flex items-center justify-center text-sm
-                            ${day.isCurrentMonth ? 'text-white' : 'text-white/30'}
-                        `}
-                    >
-                        <span
-                            className={`
-                                flex items-center justify-center w-3 h-1
-                                ${day.isToday ? 'text-[#B388FF] font-bold rounded-full' : ''}
-                            `}
-                        >
-                            {day.dayOfMonth}
-                        </span>
-                    </div>
-                ))}
             </div>
+
+            <div className={`grid grid-cols-7 ${month ? "h-full" : ""} gap-1 mb-2 ${month ? "px-7" : ""}`}>
+  {calendarDays.map((day, index) => (
+    <div
+      key={index}
+      className={`
+        relative
+        ${month ? 
+          "min-h-[3rem] border border-white/5 rounded-md bg-black/40 hover:border-white/25" : 
+          "flex items-center justify-center"
+        }
+        ${day.isCurrentMonth ? 'text-white' : 'text-white/30'}
+        ${day.isToday ? "!border-[#B388FF] !border-2" : ""}
+      `}
+    >
+      <span className={`
+        ${month ? "absolute top-1 right-1 text-xs" : "text-xs"}
+        ${day.isToday ? "text-[#B388FF] font-bold" : ""}
+      `}>
+        {day.dayOfMonth}
+      </span>
+
+      {month && (
+        <div className="absolute inset-0 pt-6 overflow-hidden">
+          <div className="h-full overflow-y-auto scrollbar-hide px-1">
+            {getEventsForDay(day).map(event => (
+              <div 
+                key={event.id}
+                className="text-[0.6rem] px-1 py-1.5 mb-1 rounded truncate"
+                style={{ 
+                  backgroundColor: `${getCategoryColor(event.category)}30`,
+                  lineHeight: '1.2'
+                }}
+              >
+                {event.title}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
         </div>
     );
 };

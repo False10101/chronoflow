@@ -4,6 +4,7 @@ import {NotFoundPage} from './NotFoundPage';
 import { Routes, Route } from 'react-router-dom';
 import DashboardPage from './Dashboard';
 import ExpenseTracker from './ExpenseTracker'; 
+import CalendarPage from './CalendarPage';
 
 function App() {
     return (
@@ -28,6 +29,15 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ExpenseTracker/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path='/events'
+                    element={
+                        <ProtectedRoute>
+                            <CalendarPage/>
                         </ProtectedRoute>
                     }
                 />

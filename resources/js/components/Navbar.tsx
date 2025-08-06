@@ -24,7 +24,7 @@ export default function Navbar() {
           <Home color={pathname === "/" ? "#B388FF" : "white"} />
         </div>
         <div
-          onClick={() => handleRedirect("expense-tracker")}
+          onClick={() => handleRedirect("/expense-tracker")}
           className={`border-[1px] rounded-md overflow-hidden w-[60%] aspect-square flex items-center justify-center ${pathname === "/expense-tracker"
             ? "border-[#B388FF] "
             : "border-white/20 hover:border-white/40"
@@ -33,7 +33,7 @@ export default function Navbar() {
           <Wallet color={pathname === "/expense-tracker" ? "#B388FF" : "white"} />
         </div>
         <div
-          onClick={() => handleRedirect("events")}
+          onClick={() => handleRedirect("/events")}
           className={`border-[1px] rounded-md overflow-hidden w-[60%] aspect-square flex items-center justify-center ${pathname === "/events"
             ? "border-[#B388FF] "
             : "border-white/20 hover:border-white/40"
@@ -42,7 +42,7 @@ export default function Navbar() {
           <Calendar color={pathname === "/events" ? "#B388FF" : "white"} />
         </div>
         <div
-          onClick={() => handleRedirect("school-dashboard")}
+          onClick={() => handleRedirect("/school-dashboard")}
           className={`border-[1px] rounded-md overflow-hidden w-[60%] aspect-square flex items-center justify-center ${pathname === "/school-dashboard"
             ? "border-[#B388FF] "
             : "border-white/20 hover:border-white/40"
@@ -51,7 +51,7 @@ export default function Navbar() {
           <GraduationCap color={pathname === "/school-dashboard" ? "#B388FF" : "white"} />
         </div>
         <div
-          onClick={() => handleRedirect("chores")}
+          onClick={() => handleRedirect("/chores")}
           className={`border-[1px] rounded-md overflow-hidden w-[60%] aspect-square flex items-center justify-center ${pathname === "/chores"
             ? "border-[#B388FF] "
             : "border-white/20 hover:border-white/40"
